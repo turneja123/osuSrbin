@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 global.fetch = require('node-fetch');
-const client = new Discord.Client();
+global.client = new Discord.Client();
 const { prefix, token, api_key } = require('./config.json');
 const { lb } = require('./commands/lb.js');
 

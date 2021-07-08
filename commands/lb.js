@@ -53,8 +53,26 @@ module.exports = {
                 icon_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Osu%21Logo_%282015%29.png/600px-Osu%21Logo_%282015%29.png',
             },
         }
-        for (let i = 0; i < 5; i++) {
-            listing.fields[0].value += `**${i + 1}.** **[${json.scores[i].user.username}](https://osu.ppy.sh/users/${json.scores[i].user.username}/)**: ${numberBeautify(json.scores[i].score)} [ **${json.scores[i].max_combo}x**/${beatmap.max_combo}x ] ${craftMods(json.scores[i].mods)} \n - **${twoDecimals(json.scores[i].pp)}pp** ~ ${craftAccuracy(json.scores[i].accuracy)} ~ date \n`;
+
+        const emoji_array = ['ossh', 'oss', 'osh', 'os', 'oa', 'ob', 'oc', 'od'];
+        const emoji_map = new Map();
+        emoji_map.set('XH', 0);
+        emoji_map.set('X', 1);
+        emoji_map.set('SH', 2);
+        emoji_map.set('S', 3);
+        emoji_map.set('A', 4);
+        emoji_map.set('B', 5);
+        emoji_map.set('C', 6);
+        emoji_map.set('D', 7);
+
+        
+
+        //const ayy = client.emojis.cache.find(emoji => emoji.name === "os");
+
+        for (let i = 0; i < Math.min(5, json.scores.length); i++) {
+            listing.fields[0].value += `**${i + 1}.** ${client.emojis.cache.find(emoji => emoji.name === emoji_array[emoji_map.get(json.scores[i].rank)])} **[${json.scores[i].user.username}](https://osu.ppy.sh/users/${json.scores[i].user.id}/)**: ${numberBeautify(json.scores[i].score)} [ **${json.scores[i].max_combo}x**/${beatmap.max_combo}x ] ${craftMods(json.scores[i].mods)} \n - **${twoDecimals(json.scores[i].pp)}pp** ~ ${craftAccuracy(json.scores[i].accuracy)}`;
+            listing.fields[0].value += ` \u25b8 [${json.scores[i].statistics.count_300}/${json.scores[i].statistics.count_100}/${json.scores[i].statistics.count_50}/${json.scores[i].statistics.count_miss}] ~ ${json.scores[i].created_at.slice(0, 10)}\n`
+
         }
         message.channel.send({ embed: listing });
     }

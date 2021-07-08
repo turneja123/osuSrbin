@@ -8,9 +8,16 @@ module.exports.getBeatmap_Id = function (url) {
 }
 
 module.exports.twoDecimals = function (str) {
+    if (str === null) {
+        return "0.00";
+    }
     str = str.toString();
     let arr = str.split(".");
     let ret = arr[0];
+    if (arr.length === 1) {
+        ret += ".00";
+        return ret;
+    }
     if (arr[1].length != 0) {
         ret += '.';
     }
