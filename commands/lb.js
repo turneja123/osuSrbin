@@ -20,7 +20,23 @@ module.exports = {
         let url = `https://osu.ppy.sh/beatmaps/${beatmap_id}/scores`;
         if (flag) {
             url += "?type=country";
+        } 
+
+        if (args[2] !== 0) {
+            if (flag) {
+                url += "&";
+            } else {
+                url += "?";
+            }
+            for (let i = 1; i < args[2].length; i += 2) {
+                let osuMod = (args[2][i] + args[2][i + 1]).toUpperCase();
+                if (i !== 1) {
+                    url += "&";
+                }
+                url += `mods[]=${osuMod}`;
+            }
         }
+
         let json = await fetch(url, requestOptions).then(response => response.json());
 
         let jsonbeatmap = await fetch(`https://osu.ppy.sh/api/get_beatmaps?k=${api_key}&b=${beatmap_id}`).then(response => response.text());
@@ -64,10 +80,6 @@ module.exports = {
         emoji_map.set('B', 5);
         emoji_map.set('C', 6);
         emoji_map.set('D', 7);
-
-        
-
-        //const ayy = client.emojis.cache.find(emoji => emoji.name === "os");
 
         for (let i = 0; i < Math.min(5, json.scores.length); i++) {
             listing.fields[0].value += `**${i + 1}.** ${client.emojis.cache.find(emoji => emoji.name === emoji_array[emoji_map.get(json.scores[i].rank)])} **[${json.scores[i].user.username}](https://osu.ppy.sh/users/${json.scores[i].user.id}/)**: ${numberBeautify(json.scores[i].score)} [ **${json.scores[i].max_combo}x**/${beatmap.max_combo}x ] ${craftMods(json.scores[i].mods)} \n - **${twoDecimals(json.scores[i].pp)}pp** ~ ${craftAccuracy(json.scores[i].accuracy)}`;

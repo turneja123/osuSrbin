@@ -24,7 +24,6 @@ client.on('message', async message => {
 	console.log(message.content);
     const msg = message.content.split(" ");
 
-
     if (msg[0] === `${prefix}osu`) {
         let json = await fetch(`https://osu.ppy.sh/api/get_user?k=${api_key}&u=${msg[1]}`).then(response => response.text());
         json = json.substring(1);
@@ -34,14 +33,18 @@ client.on('message', async message => {
     }
 
     if (msg[0] === `${prefix}lb`) {
-        args = [msg[1], 0];
+        args = [msg[1], 0, 0];
+        if (msg.length > 2) {
+            args[2] = msg[2];
+        }
         client.commands.get("lb").execute(message, args);
-        
     }
 
-
     if (msg[0] === `${prefix}country`) {
-        args = [msg[1], 1];
+        args = [msg[1], 1, 0];
+        if (msg.length > 2) {
+            args[2] = msg[2];
+        }
         client.commands.get("lb").execute(message, args);
     }
 })
