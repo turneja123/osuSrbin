@@ -1,9 +1,13 @@
+const { DiscordAPIError } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
+
 module.exports = { 
     name: 'lb',
     async execute(message, args) {
         
         const { getBeatmap_Id, twoDecimals, craftAccuracy, numberBeautify, craftMods } = require('../auxiliary.js');
         const { api_key, cookie } = require('../config.json');
+        const paginationEmbed = require('discord.js-pagination');
 
         var myHeaders = new fetch.Headers();
         myHeaders.append("Cookie", cookie);
@@ -66,8 +70,8 @@ module.exports = {
             timestamp: new Date(),
             footer: {
                 text: `Map by ${beatmap.creator}`,
-                icon_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Osu%21Logo_%282015%29.png/600px-Osu%21Logo_%282015%29.png',
-            },
+                icon_url: `https://a.ppy.sh/${beatmap.creator_id}`,
+            },      
         }
 
         const emoji_array = ['ossh', 'oss', 'osh', 'os', 'oa', 'ob', 'oc', 'od'];
@@ -81,11 +85,19 @@ module.exports = {
         emoji_map.set('C', 6);
         emoji_map.set('D', 7);
 
-        for (let i = 0; i < Math.min(5, json.scores.length); i++) {
-            listing.fields[0].value += `**${i + 1}.** ${client.emojis.cache.find(emoji => emoji.name === emoji_array[emoji_map.get(json.scores[i].rank)])} **[${json.scores[i].user.username}](https://osu.ppy.sh/users/${json.scores[i].user.id}/)**: ${numberBeautify(json.scores[i].score)} [ **${json.scores[i].max_combo}x**/${beatmap.max_combo}x ] ${craftMods(json.scores[i].mods)} \n - **${twoDecimals(json.scores[i].pp)}pp** ~ ${craftAccuracy(json.scores[i].accuracy)}`;
-            listing.fields[0].value += ` \u25b8 [${json.scores[i].statistics.count_300}/${json.scores[i].statistics.count_100}/${json.scores[i].statistics.count_50}/${json.scores[i].statistics.count_miss}] ~ ${json.scores[i].created_at.slice(0, 10)}\n`
+        const pages = [];
+
+        for (let j = 0; j < Math.min(50, json.scores.length); j += 5) {
+            for (let i = j; i < Math.min(j + 5, json.scores.length); i++) {
+                listing.fields[0].value += `**${i + 1}.** ${client.emojis.cache.find(emoji => emoji.name === emoji_array[emoji_map.get(json.scores[i].rank)])} **[${json.scores[i].user.username}](https://osu.ppy.sh/users/${json.scores[i].user.id}/)**: ${numberBeautify(json.scores[i].score)} [ **${json.scores[i].max_combo}x**/${beatmap.max_combo}x ] ${craftMods(json.scores[i].mods)} \n - **${twoDecimals(json.scores[i].pp)}pp** ~ ${craftAccuracy(json.scores[i].accuracy)}`;
+                listing.fields[0].value += ` \u25b8 [${json.scores[i].statistics.count_300}/${json.scores[i].statistics.count_100}/${json.scores[i].statistics.count_50}/${json.scores[i].statistics.count_miss}] ~ ${json.scores[i].created_at.slice(0, 10)}\n`;
+            }
+            const tempEmbed = new MessageEmbed(listing);
+            pages.push(tempEmbed);
+            listing.fields[0].value = ``;
 
         }
-        message.channel.send({ embed: listing });
+        
+        paginationEmbed(message, pages);
     }
 }
